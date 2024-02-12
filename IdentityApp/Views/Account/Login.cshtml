@@ -1,0 +1,31 @@
+@model LoginViewModel
+
+@{
+    ViewData["Title"] = "Giriş Yap"; 
+}
+
+<div class="text-center">
+    <h6 class="display-6">
+        Giriş Yap
+    </h6>
+</div>
+
+<form method="post" asp-action="Login">
+    <div class="text-danger my-3" asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label>Kullanıcı adı</label>
+        <input class="form-control" asp-for="Username" aria-describedby="emailHelp" placeholder="email">
+    </div>
+    <div class="form-group my-3">
+        <label>Şifre</label>
+        <input class="form-control" asp-for="Password" placeholder="şifre">
+    </div>
+    
+    <div class="form-group form-check my-3">
+        <input type="checkbox" class="form-check-input" asp-for="RememberMe">
+        <label class="form-check-label">Beni hatırla</label>
+    </div>
+    
+    
+    <button type="submit" class="btn btn-primary my-3">Giriş Yap</button>
+</form>

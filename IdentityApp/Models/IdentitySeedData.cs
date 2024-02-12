@@ -25,15 +25,16 @@ public static class IdentitySeedData
             .ApplicationServices
             .CreateScope()
             .ServiceProvider
-            .GetRequiredService<UserManager<IdentityUser>>();
+            .GetRequiredService<UserManager<AppUser>>();
 
         var user = await userManager.FindByNameAsync(adminUser);
 
         if (user == null)
         {
-            user = new IdentityUser()
+            user = new AppUser()
             {
                 UserName = adminUser,
+                FullName = "Grant Wick",
                 Email = "admin@gmail.com",
                 PhoneNumber = "44444444444"
             };

@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityApp.Models;
 
-public class IdentityContext : IdentityDbContext<IdentityUser>
+// string olarak id alsın
+public class IdentityContext : IdentityDbContext<AppUser,AppRole,string>
 {
     public IdentityContext(DbContextOptions options) : base(options)
     {

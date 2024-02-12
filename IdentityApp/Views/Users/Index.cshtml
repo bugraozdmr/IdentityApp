@@ -1,4 +1,4 @@
-@model IQueryable<IdentityUser>
+@model IQueryable<AppUser>
 
 <div class="text-center">
     <h6 class="display-6">Users</h6>
@@ -25,9 +25,15 @@
             <td>@item.Id</td>
             <td>@item.UserName</td>
             <td>@item.Email</td>
-            <td>
-                <a href="" class="btn btn-primary">Edit</a>
-                <a href="" class="btn btn-danger">Delete</a>
+            <td style="width: 126px">
+                <div class="btn-group">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                    <form asp-action="Delete" method="post" onsubmit="return confirm('emin misiniz')">
+                        <input type="hidden" name="Id" value="@item.Id"/>
+                        <button class="btn btn-danger">Delete</button>
+                    </form>
+                    
+                </div>
             </td>
         </tr>
     }

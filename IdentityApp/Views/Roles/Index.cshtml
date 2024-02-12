@@ -1,0 +1,49 @@
+@model IQueryable<AppRole>
+
+<div class="text-center">
+    <h6 class="display-6">Roles</h6>
+</div>
+
+<hr/>
+
+<div class="justify-content-end d-flex my-3">
+    <a class="btn btn-secondary" asp-action="Create">Create Role</a>
+</div>
+<table class="table table-sm table-bordered">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Role Adı</th>
+        <th>Kullanıcılar</th>
+    </tr>
+    </thead>
+    <tbody>
+    @if (!Model.Count().Equals(0))
+    {
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <!-- 
+                seslenemedi çünkü iki aynı elemanı kullanamaya çalışıyor ana sayfa zaten Rolemanager'ı seslemişken
+                diğeri tekrar seslemeye çalışıyor patlıyor mysql
+                <td asp-role-users="@item.Id"></td>
+                -->
+                <td>
+                    <form method="post">
+                        <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@item.Id">Düzenle</a>
+                        <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="4" class="text-center">Rol yok.</td>
+        </tr>
+    }
+    </tbody>
+</table>

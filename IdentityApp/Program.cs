@@ -19,7 +19,7 @@ builder.Services.AddDbContextPool<IdentityContext>(opt =>
 });
 
 // Configuring Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+builder.Services.AddIdentity<AppUser, AppRole>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
         options.User.RequireUniqueEmail = true;
@@ -29,6 +29,10 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
         options.Password.RequireLowercase = false;
         options.Password.RequireNonAlphanumeric = false;
         
+        // ASP net core Identity incele dökümantasyon 5 fail hakkı
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        
         // denedim ...
         // options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789çÇİİöÖşŞüÜ";
 
@@ -36,6 +40,13 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<IdentityContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.SlidingExpiration = true;   // expiration var demek
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+});
 
 
 var app = builder.Build();
@@ -53,6 +64,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// HiHiHa
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

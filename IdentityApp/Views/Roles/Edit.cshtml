@@ -1,0 +1,61 @@
+@model AppRole
+
+<div class="text-center">
+    <h6 class="display-6">Edit Role</h6>
+</div>
+
+
+<form asp-action="Edit" method="post">
+    <div class="text-danger" asp-validation-summary="All"></div>
+    
+    <input type="hidden" name="Id" value="@Model?.Id"/>
+    
+    
+    <div class="mb-3">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" value="@Model?.Name"/>
+    </div>
+    
+    
+    
+    
+    <div class="btn-group">
+        <button type="submit" class="btn btn-primary">Güncelle</button>
+        <a asp-action="Index" class="btn btn-warning">Geri</a>    
+    </div> 
+</form>
+
+
+@if (ViewBag.Users is not null)
+{
+    <table class="table table-sm table-bordered my-3">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in ViewBag.Users)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.UserName</td>
+                <td>@item.Email</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" asp-action="Edit" asp-controller="Users" asp-route-id="@item.Id">Düzenle</a>
+                </td>
+                
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <h4>
+        Bu rolde hiç kullanıcı yok.
+    </h4> 
+}
