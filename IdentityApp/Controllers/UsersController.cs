@@ -1,22 +1,30 @@
+using System.Web;
 using IdentityApp.Models;
 using IdentityApp.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityApp.Controllers;
 
+// buraya koymadım bilerek Create sorunlu
 public class UsersController : Controller
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly RoleManager<AppRole> _roleManager;
+    private readonly IEmailSender _emailSender;
 
-    public UsersController(UserManager<AppUser> manager, RoleManager<AppRole> roleManager)
+    public UsersController(UserManager<AppUser> manager, 
+        RoleManager<AppRole> roleManager,
+        IEmailSender emailSender)
     {
         _userManager = manager;
         _roleManager = roleManager;
+        _emailSender = emailSender;
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult Index()
     {
         ViewData["Title"] = "Users";
@@ -29,10 +37,12 @@ public class UsersController : Controller
         return View();
     }
     
+    [AllowAnonymous]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([FromForm] CreateViewModel model)
     {
+        // bunu taşı bence
         if (ModelState.IsValid)
         {
             var user = new AppUser() { UserName = model.Username, Email = model.Email , FullName = model.FullName};
@@ -41,7 +51,22 @@ public class UsersController : Controller
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Index");
+                // bu işlemleri direkt account controllera yazabilirdik dağınık olmazdı ...
+                string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                
+                // token encode edilmezse çalışmaz
+                var encoded_token = HttpUtility.UrlEncode(token);
+                var url = Url.Action("ConfirmEmail", "Account",new {id=user.Id,token=encoded_token});
+                
+                // email
+
+                await _emailSender.SendEmailAsync(user.Email, "Hesap onayı",
+                    $"Lütfen email hesabınızı onaylamak için maile " +
+                    $"<a href='https://localhost:7284{url}'>tıklayın</a>");
+                
+                
+                TempData["message"] = "email hesabınızdaki onay mailine tıklayın.";
+                return RedirectToAction("Login","Account");
             }
 
             foreach (var err in result.Errors)
@@ -55,6 +80,7 @@ public class UsersController : Controller
         return View(model);
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Edit([FromRoute]string id)
     {
         if (id is null)
@@ -81,6 +107,7 @@ public class UsersController : Controller
         return RedirectToAction("Index");
     }
     
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([FromRoute]string id,[FromForm] EditViewModel model)
@@ -133,6 +160,7 @@ public class UsersController : Controller
         return View(model);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete([FromForm] string id)

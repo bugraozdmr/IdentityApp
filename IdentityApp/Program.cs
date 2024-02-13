@@ -21,7 +21,8 @@ builder.Services.AddDbContextPool<IdentityContext>(opt =>
 // Configuring Identity
 builder.Services.AddIdentity<AppUser, AppRole>(options =>
     {
-        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedAccount = true;
+        
         options.User.RequireUniqueEmail = true;
         options.Password.RequiredLength = 6;
         options.Password.RequireDigit = false;
@@ -38,7 +39,7 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
 
     })
     .AddEntityFrameworkStores<IdentityContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders();    // generate tokenları kullanmak için gerekli
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -48,6 +49,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(30);
 });
 
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>(i => new SmtpEmailSender(
+    builder.Configuration["EmailSender:Host"],
+    builder.Configuration.GetValue<int>("EmailSender:Port"),
+    builder.Configuration.GetValue<bool>("EmailSender:EnableSSL"),
+    builder.Configuration["EmailSender:Username"],
+    builder.Configuration["EmailSender:Password"]
+    ));
 
 var app = builder.Build();
 
